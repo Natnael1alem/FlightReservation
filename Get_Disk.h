@@ -12,6 +12,7 @@ using namespace std;
 //Memory Locations
 map<string, User> users;
 map<string, Flight> flights;
+map<int, Booking> bookings;
 
 
 void read_flights();
@@ -143,47 +144,49 @@ void read_bookings(){
 
 
 void i_flight_booker(string _flight_id, string _username){
-    User temp_user;
-    Flight temp_flight;
+    //Add Booking Relationship
+    Booking temp_booking;
+    temp_booking.set_booking(_username, _flight_id, line);
+    bookings[line] = temp_booking;
+    //cout<<"Booking read User: "<<temp_booking.get_line()<<endl;
+    cout<<"Booking read User: "<<bookings[temp_booking.get_line()].get_username()<<", Flight: "<<bookings[temp_booking.get_line()].get_flight_id()<<", Line: "<<bookings[temp_booking.get_line()].get_line()<<endl;
 
     //Add Flight to the User
     if (users.find(_username) != users.end()) {
         //copies user data to temporary user
-        temp_user = users[_username];
-            cout<<"Passenger Added, the pass"<<endl;
+        User temp_user = users[_username];
 
         //add flight to the temporary user
-        temp_user.add_flight(_flight_id);
-        //cout<<"Flight "<<users[_username].get_my_flights()<<" added to user "<<users[_username].getUsername()<<endl;
+        temp_user.add_flight(_flight_id, line);
 
         //replace the old user by the new temporary user
         users[_username] = temp_user;
+
+        cout<<"Passenger "<<_username<<" booked on flight: "<<_flight_id<<endl;
+
     } else {
-        cout << "User " << _username <<", flight id: "<<_flight_id<< " does not exist can add flight from disk." << endl;
+        cout << "User " << _username <<", flight id: "<<_flight_id<< " does not exist can't add flight from disk." << endl;
     }
 
 
     //Add Passenger to the Flight
     if (flights.find(_flight_id) != flights.end()) {
         //copies flight data to temporary flight
-        temp_flight = flights[_flight_id];
+        Flight temp_flight = flights[_flight_id];
+        User temp_user = users[_username];
 
         //add passenger to the temporary flight
-        temp_flight.add_passenger(_username);
-        cout<<"Passenger Added, the pass"<<endl;
-        for (const auto& user_map : temp_flight.get_my_passengers()){
-            temp_user = users[user_map.first];
-            cout<<"Passenger Added, the pass"<<temp_user.getPassword()<<endl;
-        }
-        
-        //cout<<"Flight "<<users[_username].get_my_flights()<<" added to user "<<users[_username].getUsername()<<endl;
-
+        temp_flight.add_passenger(_username, line);
+    
         //replace the old flight by the new temporary flight
         flights[_flight_id] = temp_flight;
-    } else {
-        cout << "User " << _username <<", flight id: "<<_flight_id<< " does not exist can add flight from disk." << endl;
-    }
 
+        cout<<"Flight: "<<_flight_id<<": Passenger "<<temp_user.getUsername()<<" has Booked."<<endl;
+    } else {
+        cout << "User " << _username <<", flight id: "<<_flight_id<< " does not exist cannot book flight." << endl;
+    }
+    
+    line++;
     refresh_bookings(); //Add flight Count for the Plane
 }
 
@@ -206,7 +209,6 @@ void refresh_bookings(){
         temp_flight = flights[flight_map.first];
         for (const auto& user_map : temp_flight.get_my_passengers()){
             temp_user = users[user_map.first];
-            cout<<"Haha"<<endl;
             if(users.find(temp_user.getUsername()) == users.end()){
                 cout<<"Error Found, Mismatch of booking, Unknown passenger booked on Flight "<<temp_flight.get_flight_id()<<"!"<<endl;
             }

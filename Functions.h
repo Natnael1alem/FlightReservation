@@ -136,20 +136,27 @@ void flight_booker(string _username){
 
 
     if(make_payment(temp_flight_id, _username)){
-
         //ADD Flight to User
         if (users.find(_username) != users.end()) {
             //copies user data to temporary user and add flight to the temporary user, replace the old current user by the new temporary user
             temp_user = users[_username];
-            temp_user.add_flight(temp_flight_id);
-            users[_username] = temp_user;
+            temp_flight = flights[temp_flight_id];
 
+            Booking temp_booking;
+            temp_booking.set_booking(_username, temp_flight_id, line);
+            temp_user.add_flight(temp_flight_id, temp_booking.get_line());
+            temp_flight.add_passenger(_username, temp_booking.get_line());
+
+            bookings.insert(pair<int, Booking>(temp_booking.get_line(), temp_booking));
+            users[_username] = temp_user;
+            flights[temp_flight_id] = temp_flight;
+
+            line++;
+            update_bookings();
         } else{
             cout << "User " << _username << " does not exist when adding to user." << endl;
         }
 
-
-        update_bookings();
     }else{
         cout<<"couldn't book, not enough balance."<<endl;
     }
@@ -175,27 +182,18 @@ void delete_booking(string _username){
     users[_username] = temp_user;
     update_bookings();
 }
-void update_bookings(){
+
+void update_bookings(){ 
     ofstream o_booking_list("BOOKING_LIST.txt", ios::out);
     if(o_booking_list.fail()){
         cerr<<"Booking file not found!";
     }
 
-    User temp_user;
-    Flight temp_flight;
-    o_booking_list<<"Hello"<<endl;
     for (const auto& flight_map : flights){
-        temp_flight = flights[flight_map.first];
-        for (const auto& user_map : temp_flight.get_my_passengers()){
-            temp_user = users[user_map.first];
-            
-            cout<<"Hello"<<endl;
-            cout<<user_map.first<<endl;
-            temp_user = users[user_map.first];
-            string t_my_flights = temp_flight.get_flight_id();
-            string t_username = temp_user.getUsername();
-            cout<<t_username<<"$"<<t_my_flights;
-            o_booking_list<<t_username<<"$"<<t_my_flights<<endl;
+        Flight temp_flight = flights[flight_map.first];
+        for (const auto& user_map : temp_flight.get_my_passengers()){            
+            User temp_user = users[user_map.first];
+            o_booking_list<<temp_user.getUsername()<<"$"<<temp_flight.get_flight_id()<<endl;
         }
     }
 
@@ -290,7 +288,7 @@ bool make_payment(string _flight_id, string _username){
 //All available Flights
 void available_flights(){
     for (auto flight_map = flights.begin(); flight_map != flights.end(); ++flight_map) {
-        cout << "flight ID: " << flight_map->first<< "\t " << flight_map->second.get_flight_detail()<< endl;
+        cout << "flight ID: " << flight_map->first<< "\t " <<flight_map->second.get_flight_detail()<< endl;
     }
 
     cout<<endl;
@@ -321,7 +319,7 @@ void my_flights(string _username){
 
     for (const auto& flight_map : cur_user.get_my_flights()){
         temp_flight = flights[flight_map.first];
-        cout << "Details for flight " << temp_flight.get_flight_id() << ": " << temp_flight.get_flight_detail()<<endl;
+        cout << "Details for flight "<<temp_flight.get_line(flight_map.first) <<". " << temp_flight.get_flight_id() << ": " << temp_flight.get_flight_detail()<<endl;
     }
 }
 

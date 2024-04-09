@@ -1,13 +1,17 @@
 #ifndef AIRLINES_CLASS_DEFINITIONS_H
 #define AIRLINES_CLASS_DEFINITIONS_H
 #include "Random_Generator.h"
-//#include "Get_Disk.h"
+// #include "Get_Disk.h"
 #include <string>
 #include <iostream>
 #include <vector>
 #include <map>
 
 using namespace std;
+
+
+int line = 0;
+
 
 class Date{
 private:
@@ -22,6 +26,7 @@ public:
         username = _username;
         password = _password;
     }
+
     string getUsername(){
         return username;
     }
@@ -29,11 +34,12 @@ public:
         return password;
     }
 
-    void add_flight(string _flight_id){
-        my_flights.insert(pair<string, string>(_flight_id, ""));
+    void add_flight(string _flight_id, int line){
+        my_flights[_flight_id] = line;
+        cout<<"*flight "<<_flight_id<<" added, on line "<<line<<" on user "<<username<<endl;
     }
 
-    map<string, string> get_my_flights(){
+    map<string, int> get_my_flights(){
         return my_flights;
     }
 
@@ -55,13 +61,11 @@ public:
         }
     }
 
-
 private:
     string username;
     string password;
     double balance;
-    //vector<string>  flight_ids;
-    map<string, string> my_flights;
+    map<string, int> my_flights;
 };
 
 class Flight {
@@ -74,7 +78,7 @@ public:
     int current_number;
     bool is_available;
     double price;
-    map<string, string> passengers;
+    map<string, int> passengers;
 
     Date date;
     void set_details(string _flight_id, string _plane_model, int _max_capacity, int _price){
@@ -90,15 +94,46 @@ public:
     string get_flight_id(){
         return flight_id;
     }
-    void add_passenger(string _username){
-        passengers.insert(pair<string, string>(_username, ""));
+    int get_line(string _flight_id){
+        return passengers[_flight_id];
     }
-    map<string, string> get_my_passengers(){
+    void add_passenger(string _username, int line){
+        passengers[_username] = line;
+        cout<<"*user "<<_username<<" added, on line "<<line<<" in flight "<<flight_id<<endl;
+    }
+    map<string, int> get_my_passengers(){
         return passengers;
     }
     double get_price(){
         return price;
     }
 };
+
+class Booking{
+    private:
+        int data_no;
+        string username;
+        string flight_id;
+    public:
+        void set_booking(string _username, string _flight_id, int _line){
+            username = _username;
+            flight_id = _flight_id;
+            data_no = _line;
+        }
+        
+        int get_line(){
+            //cout << "Booking Line:" << data_no<<endl;
+            return data_no; 
+        }
+
+        string get_username(){
+            return username;
+        }
+
+        string get_flight_id(){
+            return flight_id;
+        }
+};
+
 
 #endif
