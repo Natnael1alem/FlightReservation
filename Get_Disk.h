@@ -18,8 +18,8 @@ map<int, Booking> bookings;
 void read_flights();
 void read_users();
 void read_bookings();
-void i_flight_booker(string _flight_id, string _username);
-void refresh_bookings();
+void i_flight_booker(string _flight_id, string _username, int _line);
+void check_bookings();
 
 
 void read_disk(){
@@ -119,6 +119,7 @@ void read_flights(){
 void read_bookings(){
     string temp_flight_id;
     string temp_username;
+    int temp_line;
 
     ifstream i_booking_list("BOOKING_LIST.txt", ios::in);
     if(i_booking_list.fail()){
@@ -130,12 +131,16 @@ void read_bookings(){
 
     string flight_line;
     while(getline(i_booking_list, flight_line)){
-        size_t pos = flight_line.find("$");
-        temp_username = flight_line.substr(0, pos);
-        temp_flight_id = flight_line.substr(pos+1);
+        size_t pos = flight_line.find(".");
+        size_t pos1 = flight_line.find("$");
+        temp_line = stoi(flight_line.substr(0,pos));
+        temp_flight_id = flight_line.substr(pos+1,(pos1-pos-1));
+        temp_username = flight_line.substr(pos1+1);
 
-        i_flight_booker(temp_flight_id, temp_username);
+        i_flight_booker(temp_flight_id, temp_username, temp_line);
     }
+
+    line = temp_line;
 
     cout<<endl;
 
@@ -143,11 +148,11 @@ void read_bookings(){
 }
 
 
-void i_flight_booker(string _flight_id, string _username){
+void i_flight_booker(string _flight_id, string _username, int temp_line){
     //Add Booking Relationship
     Booking temp_booking;
-    temp_booking.set_booking(_username, _flight_id, line);
-    bookings[line] = temp_booking;
+    temp_booking.set_booking(_username, _flight_id, temp_line);
+    bookings[temp_line] = temp_booking;
     //cout<<"Booking read User: "<<temp_booking.get_line()<<endl;
     cout<<"Booking read User: "<<bookings[temp_booking.get_line()].get_username()<<", Flight: "<<bookings[temp_booking.get_line()].get_flight_id()<<", Line: "<<bookings[temp_booking.get_line()].get_line()<<endl;
 
@@ -157,13 +162,12 @@ void i_flight_booker(string _flight_id, string _username){
         User temp_user = users[_username];
 
         //add flight to the temporary user
-        temp_user.add_flight(_flight_id, line);
+        temp_user.add_flight(_flight_id, temp_line);
 
         //replace the old user by the new temporary user
         users[_username] = temp_user;
 
         cout<<"Passenger "<<_username<<" booked on flight: "<<_flight_id<<endl;
-
     } else {
         cout << "User " << _username <<", flight id: "<<_flight_id<< " does not exist can't add flight from disk." << endl;
     }
@@ -176,7 +180,7 @@ void i_flight_booker(string _flight_id, string _username){
         User temp_user = users[_username];
 
         //add passenger to the temporary flight
-        temp_flight.add_passenger(_username, line);
+        temp_flight.add_passenger(_username, temp_line);
     
         //replace the old flight by the new temporary flight
         flights[_flight_id] = temp_flight;
@@ -186,15 +190,15 @@ void i_flight_booker(string _flight_id, string _username){
         cout << "User " << _username <<", flight id: "<<_flight_id<< " does not exist cannot book flight." << endl;
     }
     
-    line++;
-    refresh_bookings(); //Add flight Count for the Plane
+    check_bookings(); //Add flight Count for the Plane
 }
 
 //Update_booking
-void refresh_bookings(){
+void check_bookings(){
     Flight temp_flight;
     User temp_user;
 
+    //check my flights
     for (const auto& user_map : users) {
         temp_user = users[user_map.first];
         for (const auto& flight_map : temp_user.get_my_flights()){
@@ -205,6 +209,7 @@ void refresh_bookings(){
         }
     }
 
+    //check passengers
     for (const auto& flight_map : flights) {
         temp_flight = flights[flight_map.first];
         for (const auto& user_map : temp_flight.get_my_passengers()){
@@ -214,6 +219,8 @@ void refresh_bookings(){
             }
         }
     }
+
+    //check bookings list
 }
 
 #endif

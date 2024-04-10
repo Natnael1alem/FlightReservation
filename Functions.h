@@ -17,6 +17,7 @@ void access_user(string _username);
 void my_flights(string _username);
 void delete_booking(string _username);
 void update_bookings();
+void store_bookings(string _username, string _flight_id, int _line);
 
 string enter_pass() {
     char pin[100];
@@ -144,15 +145,16 @@ void flight_booker(string _username){
 
             Booking temp_booking;
             temp_booking.set_booking(_username, temp_flight_id, line);
-            temp_user.add_flight(temp_flight_id, temp_booking.get_line());
-            temp_flight.add_passenger(_username, temp_booking.get_line());
+            bookings[line] = temp_booking;
 
-            bookings.insert(pair<int, Booking>(temp_booking.get_line(), temp_booking));
+            temp_user.add_flight(temp_flight_id, line);
+            temp_flight.add_passenger(_username, line);
+
             users[_username] = temp_user;
             flights[temp_flight_id] = temp_flight;
 
             line++;
-            update_bookings();
+            store_bookings(temp_flight_id, _username, line);
         } else{
             cout << "User " << _username << " does not exist when adding to user." << endl;
         }
@@ -176,6 +178,9 @@ void delete_booking(string _username){
     
     // temp_flight = flights[temp_flight_id];
 
+    map<string, int> temp_my_flights = temp_user.get_my_flights();
+
+    bookings.erase(temp_my_flights[temp_flight_id]);
     temp_user.get_my_flights().erase(temp_flight_id);
     flights[temp_flight_id].get_my_passengers().erase(_username);
 
@@ -183,18 +188,26 @@ void delete_booking(string _username){
     update_bookings();
 }
 
+void store_bookings(string _username, string _flight_id, int _line){ 
+    ofstream o_booking_list("BOOKING_LIST.txt", ios::app);
+    if(o_booking_list.fail()){
+        cerr<<"Booking file not found!";
+    }
+
+    o_booking_list<<_line<<"."<<_username<<"$"<<_flight_id<<endl;
+     
+    o_booking_list.close();
+}
+
 void update_bookings(){ 
     ofstream o_booking_list("BOOKING_LIST.txt", ios::out);
     if(o_booking_list.fail()){
         cerr<<"Booking file not found!";
     }
-
-    for (const auto& flight_map : flights){
-        Flight temp_flight = flights[flight_map.first];
-        for (const auto& user_map : temp_flight.get_my_passengers()){            
-            User temp_user = users[user_map.first];
-            o_booking_list<<temp_user.getUsername()<<"$"<<temp_flight.get_flight_id()<<endl;
-        }
+    
+    for (const auto& bookings_map : bookings){
+        Booking temp_booking = bookings[bookings_map.first];
+        o_booking_list<<temp_booking.get_line()<<"."<<temp_booking.get_flight_id()<<"$"<<temp_booking.get_username()<<endl;
     }
 
     o_booking_list.close();
@@ -319,7 +332,7 @@ void my_flights(string _username){
 
     for (const auto& flight_map : cur_user.get_my_flights()){
         temp_flight = flights[flight_map.first];
-        cout << "Details for flight "<<temp_flight.get_line(flight_map.first) <<". " << temp_flight.get_flight_id() << ": " << temp_flight.get_flight_detail()<<endl;
+        cout << "Flight " << temp_flight.get_flight_id() << " " << temp_flight.get_flight_detail()<<", Line: "<<cur_user.get_line(flight_map.first)<<endl;
     }
 }
 

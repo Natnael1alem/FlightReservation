@@ -43,6 +43,10 @@ public:
         return my_flights;
     }
 
+    int get_line(string _flight_id){
+        return my_flights[_flight_id];
+    }
+
     void set_balance(double _balance){
         balance = _balance;
     }
@@ -94,8 +98,8 @@ public:
     string get_flight_id(){
         return flight_id;
     }
-    int get_line(string _flight_id){
-        return passengers[_flight_id];
+    int get_line(string _username){
+        return passengers[_username];
     }
     void add_passenger(string _username, int line){
         passengers[_username] = line;
