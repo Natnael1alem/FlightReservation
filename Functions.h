@@ -22,17 +22,26 @@ void store_bookings(string _username, string _flight_id, int _line);
 string enter_pass() {
     char pin[100];
     int k=0;
-    //cout<<"Enter  password : ";
-    while(pin[k-1]!='\r') {
-        pin[k]=getch();
-        if(pin[k-1]!='\r') {
-            cout<<"*";
+    
+    while(true) {
+        char ch = getch();
+        
+        if(ch == '\r') {
+            pin[k] = '\0';
+            break;
+        } else if(ch == '\b') {
+            if(k > 0) {
+                cout << "\b \b"; // Move cursor back, print space, move cursor back again
+                k--;
+            }
+        } else {
+            pin[k] = ch;
+            cout << "*";
+            k++;
         }
-        k++;
-
     }
-    pin[k-1]='\0';
-    cout<<endl;
+    
+    cout << endl;
     return pin;
 }
 
@@ -168,6 +177,10 @@ void delete_booking(string _username){
     User temp_user;
     Flight temp_flight;
     string temp_flight_id;
+
+    //Show available flights
+    my_flights(_username);
+
 
     //Remove Flight Id from User
     temp_user = users[_username];

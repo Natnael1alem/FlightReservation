@@ -127,8 +127,6 @@ void read_bookings(){
         exit(1);
     }
 
-
-
     string flight_line;
     while(getline(i_booking_list, flight_line)){
         size_t pos = flight_line.find(".");
