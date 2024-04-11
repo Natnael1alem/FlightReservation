@@ -43,6 +43,10 @@ public:
         return my_flights;
     }
 
+    void remove_flight(string _flight_id){
+        my_flights.erase(_flight_id);
+    }
+
     int get_line(string _flight_id){
         return my_flights[_flight_id];
     }
@@ -108,6 +112,11 @@ public:
     map<string, int> get_my_passengers(){
         return passengers;
     }
+
+    void remove_passenger(string _username){
+        passengers.erase(_username);
+    }
+
     double get_price(){
         return price;
     }

@@ -181,7 +181,6 @@ void delete_booking(string _username){
     //Show available flights
     my_flights(_username);
 
-
     //Remove Flight Id from User
     temp_user = users[_username];
     do{
@@ -189,15 +188,22 @@ void delete_booking(string _username){
         cin>>temp_flight_id;
     }while(temp_user.get_my_flights().find(temp_flight_id) == temp_user.get_my_flights().end());
     
-    // temp_flight = flights[temp_flight_id];
-
+    temp_flight = flights[temp_flight_id];
+    
+    //delete the booking from the bookings map list
     map<string, int> temp_my_flights = temp_user.get_my_flights();
-
     bookings.erase(temp_my_flights[temp_flight_id]);
-    temp_user.get_my_flights().erase(temp_flight_id);
-    flights[temp_flight_id].get_my_passengers().erase(_username);
 
-    users[_username] = temp_user;
+    //delete the flight from the user's flight list
+    users[_username].remove_flight(temp_flight_id);
+    
+    //delete the passenger from the flight
+    flights[temp_flight_id].remove_passenger(_username);
+
+    //send confirmation message that is have been deleted
+    cout<<"Flight "<<temp_flight_id<<" has been deleted From user "<<_username<<endl;
+
+    //update the changes made (deletions)
     update_bookings();
 }
 
@@ -212,6 +218,7 @@ void store_bookings(string _username, string _flight_id, int _line){
     o_booking_list.close();
 }
 
+//Update all the changes made to booking to the disk(BOOKING_LIST.txt)
 void update_bookings(){ 
     ofstream o_booking_list("BOOKING_LIST.txt", ios::out);
     if(o_booking_list.fail()){
@@ -219,7 +226,7 @@ void update_bookings(){
     }
     
     for (const auto& bookings_map : bookings){
-        Booking temp_booking = bookings[bookings_map.first];
+        Booking temp_booking = bookings_map.second;
         o_booking_list<<temp_booking.get_line()<<"."<<temp_booking.get_flight_id()<<"$"<<temp_booking.get_username()<<endl;
     }
 
