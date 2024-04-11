@@ -3,12 +3,12 @@
 
 using namespace std;
 
-bool nav_cycle = true;
-string choice;
-int nav_no;
-
 int main(){
     read_disk();// reads all disks file to memory for easy access
+
+    bool nav_cycle = true;
+    string choice;
+    int nav_no;
 
     do{
         cout<<"#########################################\n---------Welcome to the Navigator--------\n#########################################\n";

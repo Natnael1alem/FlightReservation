@@ -84,8 +84,10 @@ void log_in(){
 void access_user(string _username) {
     cout << "access granted!" << endl;
     check_cycle = false;
+    
     bool portal_cycle = true;
     int portal_nav;
+    string choice;
 
     do {
 
@@ -96,8 +98,14 @@ void access_user(string _username) {
         cout << "Press 4 Show Available Flights\n";
         cout << "Press 5 My Wallet\n";
         cout << "Press 9 Log out\n";
-        cout << "Please Enter Your Choice: ";
-        cin >> portal_nav;
+
+
+        do{
+            cout<<"Please Enter Your Choice: ";
+            cin>>choice;
+        }while (choice != "1" && choice != "2" && choice != "3" && choice != "4" && choice != "5" && choice != "9");
+    
+        portal_nav = stoi(choice);
 
         switch (portal_nav) {
             case 1:
@@ -123,7 +131,7 @@ void access_user(string _username) {
                 cout << "Undefined input" << endl;
                 break;
         }
-    }while (portal_cycle && (portal_nav == 1 || portal_nav == 2 || portal_nav == 3 || portal_nav == 4 || portal_nav == 5 || portal_nav == 9));
+    }while (portal_cycle);
 }
 
 
