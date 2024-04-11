@@ -4,6 +4,7 @@
 using namespace std;
 
 bool nav_cycle = true;
+string choice;
 int nav_no;
 
 int main(){
@@ -16,9 +17,14 @@ int main(){
         cout<<"Press 3 Refresh Data\n";
         cout<<"Press 4 Show Available Flights\n";
         cout<<"Press 9 Quit\n";
+        
 
-        cout<<"Please Enter Your Choice: ";
-        cin>>nav_no;
+        do{
+            cout<<"Please Enter Your Choice: ";
+            cin>>choice;
+        }while (choice != "1" && choice != "2" && choice != "3" && choice != "4" && choice != "9");
+    
+        nav_no = stoi(choice);
 
         switch(nav_no){
             case 1:
@@ -41,7 +47,7 @@ int main(){
                 cout<<"Undefined input"<<endl;
                 break;
         }
-    }while(nav_cycle && (nav_no == 1 || nav_no == 2 || nav_no == 3 || nav_no == 4 || nav_no == 9));
+    }while(nav_cycle);
 
     return 0;
 }
