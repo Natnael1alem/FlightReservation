@@ -118,12 +118,12 @@ void access_user(string _username) {
             case 9:
                 cout << "Logging user out ... " << endl;
                 portal_cycle = false;
-            break;
+                break;
             default:
                 cout << "Undefined input" << endl;
                 break;
         }
-    }while (portal_cycle);
+    }while (portal_cycle && (portal_nav == 1 || portal_nav == 2 || portal_nav == 3 || portal_nav == 4 || portal_nav == 5 || portal_nav == 9));
 }
 
 
