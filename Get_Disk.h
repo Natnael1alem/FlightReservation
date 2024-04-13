@@ -9,6 +9,10 @@
 using namespace std;
 
 
+
+int line = 0;
+
+
 //Memory Locations
 map<string, User> users;
 map<string, Flight> flights;
@@ -119,7 +123,7 @@ void read_flights(){
 void read_bookings(){
     string temp_flight_id;
     string temp_username;
-    int temp_line;
+    int temp_line = 0;
 
     ifstream i_booking_list("BOOKING_LIST.txt", ios::in);
     if(i_booking_list.fail()){

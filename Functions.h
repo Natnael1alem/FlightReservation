@@ -90,7 +90,6 @@ void access_user(string _username) {
     string choice;
 
     do {
-
         cout << "-----Welcome to the User Portal-----\n";
         cout << "Press 1 Preview My Bookings\n";
         cout << "Press 2 Book Flight\n";
@@ -98,7 +97,6 @@ void access_user(string _username) {
         cout << "Press 4 Show Available Flights\n";
         cout << "Press 5 My Wallet\n";
         cout << "Press 9 Log out\n";
-
 
         do{
             cout<<"Please Enter Your Choice: ";
@@ -141,12 +139,15 @@ void flight_booker(string _username){
 
     cout<<"-----Flight Booker-----"<<endl;
 
+    //See available Flights
     available_flights();
+
     User temp_user;
     Flight temp_flight;
     string temp_flight_id;
     string old_flight_id;
 
+    //Get Flight Id from Available Flights
     do{
         cout<<"Enter the Flight ID From the above: ";
         cin>>temp_flight_id;
@@ -160,6 +161,8 @@ void flight_booker(string _username){
             temp_user = users[_username];
             temp_flight = flights[temp_flight_id];
 
+            line++;
+
             Booking temp_booking;
             temp_booking.set_booking(_username, temp_flight_id, line);
             bookings[line] = temp_booking;
@@ -170,7 +173,6 @@ void flight_booker(string _username){
             users[_username] = temp_user;
             flights[temp_flight_id] = temp_flight;
 
-            line++;
             store_bookings(temp_flight_id, _username, line);
         } else{
             cout << "User " << _username << " does not exist when adding to user." << endl;

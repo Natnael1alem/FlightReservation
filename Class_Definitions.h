@@ -10,8 +10,6 @@
 using namespace std;
 
 
-int line = 0;
-
 
 class Date{
 private:
@@ -83,7 +81,7 @@ public:
     string destination;
     string plane_model;
     int max_capacity;
-    int current_number;
+    int current_number = 0;
     bool is_available;
     double price;
     map<string, int> passengers;
@@ -107,6 +105,7 @@ public:
     }
     void add_passenger(string _username, int line){
         passengers[_username] = line;
+        current_number += 1;
         cout<<"*user "<<_username<<" added, on line "<<line<<" in flight "<<flight_id<<endl;
     }
     map<string, int> get_my_passengers(){
