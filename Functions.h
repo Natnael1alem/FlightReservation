@@ -153,13 +153,13 @@ void flight_booker(string _username){
         cin>>temp_flight_id;
     }while(flights.find(temp_flight_id) == flights.end());
 
+    temp_user = users[_username];
+    temp_flight = flights[temp_flight_id];
 
-    if(make_payment(temp_flight_id, _username)){
+    if(make_payment(temp_flight_id, _username) && temp_flight.is_available()){
         //ADD Flight to User
         if (users.find(_username) != users.end()) {
             //copies user data to temporary user and add flight to the temporary user, replace the old current user by the new temporary user
-            temp_user = users[_username];
-            temp_flight = flights[temp_flight_id];
 
             line++;
 
@@ -178,8 +178,6 @@ void flight_booker(string _username){
             cout << "User " << _username << " does not exist when adding to user." << endl;
         }
 
-    }else{
-        cout<<"couldn't book, not enough balance."<<endl;
     }
 }
 //Delete any flight user booked

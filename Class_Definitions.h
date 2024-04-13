@@ -82,7 +82,6 @@ public:
     string plane_model;
     int max_capacity;
     int current_number = 0;
-    bool is_available;
     double price;
     map<string, int> passengers;
 
@@ -118,6 +117,15 @@ public:
 
     double get_price(){
         return price;
+    }
+
+    bool is_available() {
+        if ((max_capacity - current_number) > 0){
+            return true;
+        }else{
+            cout<<"Flight not Booked, No seat available"<<endl;
+            return false;
+        }
     }
 };
 

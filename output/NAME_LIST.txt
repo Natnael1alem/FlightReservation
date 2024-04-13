@@ -3,7 +3,7 @@ Nuel$n*70000
 Hamza$HHHH*70000
 Kaleab$KKKK*70000
 Yoni$YYYY*70000
-Ymenu$YYYY*70000
+Ymenu$y*700
 Efrem$EEEE*70000
 Elias$e*70000
 Kidus$KKKK*70000
