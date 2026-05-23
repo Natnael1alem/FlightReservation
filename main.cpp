@@ -4,26 +4,30 @@
 using namespace std;
 
 int main(){
-    read_disk();// reads all disks file to memory for easy access
+    // reads all disks file to memory for easy access
+    seed();
+    load_cities();
+    read_disk();
 
     bool nav_cycle = true;
     string choice;
     int nav_no;
 
     do{
-        cout<<"#########################################\n---------Welcome to the Navigator--------\n#########################################\n";
+        cout<<"#########################################\n--- Welcome to the Flight Reservation ---\n#########################################\n"<<endl;
         cout<<"Press 1 Create User\n";
         cout<<"Press 2 Log in\n";
         cout<<"Press 3 Refresh Data\n";
         cout<<"Press 4 Show Available Flights\n";
         cout<<"Press 9 Quit\n";
-        
+
+        cout<<endl;    
 
         do{
             cout<<"Please Enter Your Choice: ";
             cin>>choice;
         }while (choice != "1" && choice != "2" && choice != "3" && choice != "4" && choice != "9");
-    
+
         nav_no = stoi(choice);
 
         switch(nav_no){
@@ -47,7 +51,12 @@ int main(){
                 cout<<"Undefined input"<<endl;
                 break;
         }
+
+        cout<<endl;
+
     }while(nav_cycle);
+
+
 
     return 0;
 }

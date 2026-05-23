@@ -10,12 +10,39 @@
 using namespace std;
 
 
-
-class Date{
+class City{
 private:
-    int day;
-    int month;
-    int year;
+    string city;
+    string city_code;
+public:
+    City() {}  
+    City(string _city, string _city_code) : city(_city), city_code(_city_code) {}
+    string get_city() { return city; }
+    string get_city_code() { return city_code; }
+};
+
+class PlaneModel {
+private:
+    string model;
+    int capacity;
+public:
+    PlaneModel() {}
+    PlaneModel(string _model, int _capacity) : model(_model), capacity(_capacity) {}
+    string get_model() { return model; }
+    int get_capacity() { return capacity; }
+};
+
+class Datetime {
+private:
+    int day, month, year, hour, minute;
+public:
+    Datetime() {}
+    Datetime(int _day, int _month, int _year, int _hour, int _minute)
+        : day(_day), month(_month), year(_year), hour(_hour), minute(_minute) {}
+    string to_string_date(){
+        return to_string(day) + "/" + to_string(month) + "/" + to_string(year) +
+               " " + to_string(hour) + ":" + (minute < 10 ? "0" : "") + to_string(minute);
+    }
 };
 
 class User {
@@ -77,25 +104,35 @@ private:
 class Flight {
 public:
     string flight_id;
-    string beginning;
+    string origin;
     string destination;
-    string plane_model;
+    PlaneModel plane;
     int max_capacity;
     int current_number = 0;
     double price;
     map<string, int> passengers;
+    Datetime datetime;
 
-    Date date;
-    void set_details(string _flight_id, string _plane_model, int _max_capacity, int _price){
-        flight_id = _flight_id;
-        plane_model = _plane_model;
-        max_capacity = _max_capacity;
+    void set_details(string _flight_id, PlaneModel  _plane, string _origin, string _destination, double _price,  Datetime _datetime){
+        flight_id    = _flight_id;
+        plane   = _plane;
+        origin       = _origin;
+        destination  = _destination;
+        datetime     = _datetime;
+        max_capacity = plane.get_capacity();
         price = _price;
-    }
+
+    }      
+
     string get_flight_detail(){
-        string details =  plane_model+", "+ to_string(max_capacity)+"/"+to_string(current_number) + ", "+ to_string(price)+"$";
-        return details;
+        return "Flight ID : " + flight_id +
+            "\nRoute     : " + origin + " -> " + destination +
+            "\nPlane     : " + plane.get_model() +
+            "\nDate      : " + datetime.to_string_date() +
+            "\nSeats     : " + to_string(current_number) + "/" + to_string(max_capacity) +
+            "\nPrice     : " + to_string((int)price) + "$";
     }
+
     string get_flight_id(){
         return flight_id;
     }
@@ -127,6 +164,9 @@ public:
             return false;
         }
     }
+
+    string get_origin(){ return origin; }
+    string get_destination(){ return destination; }
 };
 
 class Booking{
