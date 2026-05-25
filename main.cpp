@@ -1,13 +1,40 @@
 #include <iostream>
 #include "Functions.h"
+#include <thread>
+#include <chrono>
+#include <ctime>
 
 using namespace std;
+
+void scheduler(){
+    tm target = {};
+    target.tm_year = 2026 - 1900;
+    target.tm_mon  = 12 - 1;
+    target.tm_mday = 13;
+    target.tm_hour = 14;
+    target.tm_min  = 0;
+    target.tm_sec  = 0;
+    time_t target_time = mktime(&target);
+
+    bool has_triggered = false;
+    while(true){
+        time_t now = time(0);
+        if(!has_triggered && difftime(now, target_time) >= 0){
+            cout << "\n[System] Running expiry check...\n";
+            check_expiry();
+            has_triggered = true;
+        }
+        this_thread::sleep_for(chrono::minutes(1));
+    }
+}
 
 int main(){
     // reads all disks file to memory for easy access
     seed();
-    load_cities();
     read_disk();
+
+    thread background_scheduler(scheduler);
+    background_scheduler.detach();
 
     bool nav_cycle = true;
     string choice;

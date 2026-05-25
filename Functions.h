@@ -1,7 +1,7 @@
 #ifndef AIRLINES_FUNCTIONS
 #define AIRLINES_FUNCTIONS
 #include "Class_Definitions.h"
-#include "GET_Disk.h"
+#include "Get_Disk.h"
 #include <cstdlib>
 #include <vector>
 #include <fstream>
@@ -10,6 +10,13 @@
 
 using namespace std;
 
+inline bool user_has_booking(const string& user, const string& flight_id) {
+    for (auto& entry : bookings)
+        if (entry.second.get_username() == user && entry.second.get_flight_id() == flight_id)
+            return true;
+    return false;
+}
+
 void flight_booker(string _username);
 void store_name(User _temp_user);
 void available_flights();
@@ -17,7 +24,8 @@ void access_user(string _username);
 void my_flights(string _username);
 void delete_booking(string _username);
 void update_bookings();
-void store_bookings(string _username, string _flight_id, int _line);
+void update_users();
+void store_bookings(string _username, string _flight_id, int _line, bool _is_paid, Datetime _expiry);
 vector<pair<string, Flight>> filter_flights();
 
 string enter_pass() {
@@ -149,7 +157,7 @@ void access_user(string _username) {
 }
 
 
-
+void comment (){
 //Fight Booker
 // void flight_booker(string _username){
 
@@ -231,6 +239,7 @@ void access_user(string _username) {
 
 //     }
 // }
+};
 
 
 
@@ -241,6 +250,8 @@ void flight_booker(string _username){
     vector<pair<string, Flight>> flight_list = filter_flights();
 
     if(flight_list.empty()){ cout << "No flights available for this route." << endl; return; }
+
+    cout << endl;
 
     for(int i = 0; i < (int)flight_list.size(); i++)
         cout << i+1 << ".\n" << flight_list[i].second.get_flight_detail() << endl << endl;
@@ -256,27 +267,57 @@ void flight_booker(string _username){
     User temp_user = users[_username];
     Flight temp_flight = flights[temp_flight_id];
 
+    if(user_has_booking(_username, temp_flight_id)){
+        cout << "You have already booked this flight!" << endl;
+        return;
+    }
+
     string confirm;
     cout << "\n" << flight_list[flight_choice - 1].second.get_flight_detail() << endl;
-    cout << "Confirm booking? (y/n): ";
+    cout << "\nConfirm booking? (y/n): ";
     cin >> confirm;
-    if(confirm != "y"){ cout << "Booking cancelled." << endl; return; }
+    if(confirm != "y"){ cout << "Booking cancelled." << endl << endl; return; }
 
-    if(make_payment(temp_flight_id, _username) && temp_flight.is_available()){
-        if(users.find(_username) != users.end()){
-            line++;
-            Booking temp_booking;
-            temp_booking.set_booking(_username, temp_flight_id, line);
-            bookings[line] = temp_booking;
-            temp_user.add_flight(temp_flight_id, line);
-            temp_flight.add_passenger(_username, line);
-            users[_username] = temp_user;
-            flights[temp_flight_id] = temp_flight;
-            store_bookings(temp_flight_id, _username, line);
-        } else {
-            cout << "User " << _username << " does not exist." << endl;
-        }
+    bool is_paid = make_payment(temp_flight_id, _username);
+
+    Datetime today = Datetime::get_today();
+    Datetime flight_date = temp_flight.get_datetime(); // add this getter to Flight
+    Datetime one_day_before_flight = Datetime::add_days(flight_date, -1);
+    Datetime one_day_from_now = Datetime::add_days(today, 1);
+
+    Datetime expiry = one_day_from_now.is_before(one_day_before_flight) ? one_day_from_now : one_day_before_flight;
+
+    if(users.find(_username) != users.end()){
+        line++;
+        Booking temp_booking;
+        temp_booking.set_booking(_username, temp_flight_id, line, is_paid, expiry);
+        bookings[line] = temp_booking;
+        temp_user = users[_username];
+        temp_user.add_flight(temp_flight_id, line);
+        temp_flight.add_passenger(_username, line);
+        users[_username] = temp_user;
+        flights[temp_flight_id] = temp_flight;
+        store_bookings(_username, temp_flight_id, line, is_paid, expiry);
     }
+
+
+    // if(make_payment(temp_flight_id, _username) && temp_flight.is_available()){
+    //     if(users.find(_username) != users.end()){
+    //         line++;
+    //         Booking temp_booking;
+    //         temp_booking.set_booking(_username, temp_flight_id, line);
+    //         bookings[line] = temp_booking;
+    //         temp_user.add_flight(temp_flight_id, line);
+    //         temp_flight.add_passenger(_username, line);
+    //         users[_username] = temp_user;
+    //         flights[temp_flight_id] = temp_flight;
+    //         store_bookings(temp_flight_id, _username, line);
+    //     } else {
+    //         cout << "User " << _username << " does not exist." << endl;
+    //     }
+    // }
+
+    return;
 }
 
 
@@ -299,14 +340,15 @@ void delete_booking(string _username){
     
     temp_flight = flights[temp_flight_id];
     
-    //delete the booking from the bookings map list
-    map<string, int> temp_my_flights = temp_user.get_my_flights();
-    bookings.erase(temp_my_flights[temp_flight_id]);
+    vector<int> lines_to_remove;
+    for (auto& entry : bookings) {
+        if (entry.second.get_username() == _username && entry.second.get_flight_id() == temp_flight_id)
+            lines_to_remove.push_back(entry.first);
+    }
+    for (int ln : lines_to_remove)
+        bookings.erase(ln);
 
-    //delete the flight from the user's flight list
     users[_username].remove_flight(temp_flight_id);
-    
-    //delete the passenger from the flight
     flights[temp_flight_id].remove_passenger(_username);
 
     //send confirmation message that is have been deleted
@@ -316,27 +358,32 @@ void delete_booking(string _username){
     update_bookings();
 }
 
-void store_bookings(string _username, string _flight_id, int _line){ 
+void store_bookings(string _username, string _flight_id, int _line, bool _is_paid, Datetime _expiry){ 
     ofstream o_booking_list("output/BOOKING_LIST.txt", ios::app);
     if(o_booking_list.fail()){
         cerr<<"Booking file not found!";
     }
 
-    o_booking_list<<_line<<"."<<_username<<"$"<<_flight_id<<endl;
+    // o_booking_list<<_line<<"."<<_username<<"$"<<_flight_id<< "%" << _is_paid << "!" << _expiry.to_string_file() <<endl;
+    o_booking_list << _line << "." << _flight_id << "$" << _username << "%" << _is_paid << "!" << _expiry.to_string_file() << endl;
      
     o_booking_list.close();
+
+    
 }
 
 //Update all the changes made to booking to the disk(BOOKING_LIST.txt)
 void update_bookings(){ 
-    ofstream o_booking_list("BOOKING_LIST.txt", ios::out);
+    ofstream o_booking_list("output/BOOKING_LIST.txt", ios::out);
     if(o_booking_list.fail()){
         cerr<<"Booking file not found!";
     }
     
     for (const auto& bookings_map : bookings){
         Booking temp_booking = bookings_map.second;
-        o_booking_list<<temp_booking.get_line()<<"."<<temp_booking.get_flight_id()<<"$"<<temp_booking.get_username()<<endl;
+        o_booking_list << temp_booking.get_line() << "." << temp_booking.get_flight_id() << "$"
+            << temp_booking.get_username() << "%" << temp_booking.get_is_paid() << "!"
+            << temp_booking.get_expiry().to_string_file() << endl;
     }
 
     o_booking_list.close();
@@ -363,13 +410,25 @@ void create_user(){
     users[temp_username] = temp_user;// to memory
 }
 void store_name(User temp_user){
-    ofstream o_name_list("NAME_LIST.txt", ios::app);
+    ofstream o_name_list("output/NAME_LIST.txt", ios::app);
     if(o_name_list.fail()){
         cerr<<"NAME_LIST not found, Users not stored to disk!";
         exit(1);
     }
 
     o_name_list<<temp_user.getUsername()<<"$"<<temp_user.getPassword()<<"*"<<temp_user.get_balance()<<endl;
+    o_name_list.close();
+}
+
+void update_users(){
+    ofstream o_name_list("output/NAME_LIST.txt", ios::out);
+    if(o_name_list.fail()){
+        cerr << "NAME_LIST not found, failed to save balances!";
+        return;
+    }
+    for (auto& user_map : users)
+        o_name_list << user_map.second.getUsername() << "$" << user_map.second.getPassword()
+                    << "*" << user_map.second.get_balance() << endl;
     o_name_list.close();
 }
 
@@ -381,6 +440,7 @@ void wallet(string _username){
 
     do {
         cout << "1. Check balance " << endl;
+        cout<<"2. Top up balance" << endl;
         cout << "9. Return Back" << endl;
         cout << "Enter a number to choose: ";
         cin >> ch;
@@ -388,6 +448,29 @@ void wallet(string _username){
             case 1:
                 check_balance(_username);
                 break;
+            case 2: {
+                double amount;
+                cout << "Enter amount to top up: ";
+                cin >> amount;
+                double before_topup = users[_username].get_balance();
+                users[_username].set_balance(before_topup + amount);
+                cout << "\nBalance before top up: " << before_topup << endl;
+                cout << "Balance after top up: " << users[_username].get_balance() << endl;
+
+                for(auto& booking_map : bookings){
+                    Booking& b = booking_map.second;
+                    if(b.get_username() == _username && !b.get_is_paid()){
+                        double price = flights[b.get_flight_id()].get_price();
+                        if(users[_username].spend(price)){
+                            b.set_is_paid(true);
+                            cout << "Booking " << b.get_flight_id() << " is now paid!" << endl;
+                        }
+                    }
+                }
+                update_users();
+                update_bookings();
+                break;
+            }
             case 9:
                 cout << "Returning back ... " << endl;
                 wallet_cycle = false;
@@ -398,6 +481,7 @@ void wallet(string _username){
         }
 
     } while (wallet_cycle);
+
 }
 void check_balance(string _username){
     cout<<"Your current balance is: "<<users[_username].get_balance()<<endl;
@@ -405,69 +489,43 @@ void check_balance(string _username){
 
 
 //Make Payment
+// bool make_payment(string _flight_id, string _username){
+//     Flight temp_flight = flights[_flight_id];
+//     string order_code = "o_"+generateRandomString();
+//     double amount = temp_flight.get_price();
+//     bool proceed = false;
+
+//     //spend balance for booking
+//     User temp_user = users[_username]; //makes a copy of the user
+//     cout<<"\nBefore payment Balance: "<<temp_user.get_balance()<<endl;
+//     proceed = temp_user.spend(amount); // apply changes(spend some money) to the user copy
+//     users[_username] = temp_user;   //replace the actual user by the copy
+
+//     cout<<"Remaining Balance: "<<users[_username].get_balance()<<endl;
+//     cout<<"Your order code is: "<<order_code<<endl << endl;
+    
+//     return proceed;
+// }
+
 bool make_payment(string _flight_id, string _username){
     Flight temp_flight = flights[_flight_id];
-    string order_code = "o_"+generateRandomString();
     double amount = temp_flight.get_price();
-    bool proceed = false;
 
-    //spend balance for booking
-    User temp_user = users[_username]; //makes a copy of the user
-    //cout<<"Before payment Balance: "<<wallets[wallet_id].get_balance()<<endl;
-    proceed = temp_user.spend(amount); // apply changes(spend some money) to the user copy
-    users[_username] = temp_user;   //replace the actual user by the copy
+    User temp_user = users[_username];
+    double before = temp_user.get_balance();
+    bool paid = temp_user.spend(amount);
+    users[_username] = temp_user;
 
-    cout<<"Remaining Balance: "<<users[_username].get_balance()<<endl;
-    cout<<"your order code is: "<<order_code<<endl;
-    
-    return proceed;
+    if(paid){
+        // cout << "\nBefore payment balance: " << before << endl;
+        cout << "Payment successful! Remaining balance: " << users[_username].get_balance() << endl;
+        update_users();
+    } else {
+        cout << "Insufficient balance. Booking will be held but expires in 1 day." << endl;
+    }
+    return paid;
 }
 
-
-
-
-
-//All available Flights
-// void available_flights(){
-//     string temp_origin, temp_destination;
-//     vector<pair<string, City>> city_list(cities.begin(), cities.end());
-
-//     // pick origin
-//     cout << "Available Cities:" << endl;
-//     int i = 1;
-//     for(auto& city_map : cities){
-//         cout << i << ". " << city_map.second.get_city() << " (" << city_map.second.get_city_code() << ")\n";
-//         i++;
-//     }
-
-//     cout << "Enter Origin City Code: ";
-//     cin >> temp_origin;
-//     cout << "Enter Destination City Code: ";
-//     cin >> temp_destination;
-
-//     // look up full names
-//     string origin_name      = cities[temp_origin].get_city();
-//     string destination_name = cities[temp_destination].get_city();
-
-//     cout << "\nAvailable flights from " << origin_name << " to " << destination_name << ":\n";
-
-//     int i = 1;
-//     for (auto flight_map = flights.begin(); flight_map != flights.end(); ++flight_map) {
-//         Flight temp_flight = flight_map->second;
-        
-//         // if origin/destination provided, filter by them
-//         if(!_origin.empty() && !_destination.empty()){
-//             if(temp_flight.get_origin() != _origin || temp_flight.get_destination() != _destination){
-//                 i++;
-//                 continue;
-//             }
-//         }
-        
-//         cout << i << ".\n" << temp_flight.get_flight_detail() << endl << endl;
-//         i++;
-//     }
-//     cout << endl;
-// }
 
 vector<pair<string, Flight>> filter_flights(){
     vector<pair<string, City>> city_list(cities.begin(), cities.end());
@@ -477,7 +535,7 @@ vector<pair<string, Flight>> filter_flights(){
 
     int origin_choice, destination_choice;
     do {
-        cout << "Enter Origin Number (0 to cancel): ";
+        cout << "\nEnter Origin Number (0 to cancel): ";
         cin >> origin_choice;
         if(origin_choice == 0) return {};
     } while(origin_choice < 1 || origin_choice > (int)city_list.size());
@@ -504,6 +562,8 @@ vector<pair<string, Flight>> filter_flights(){
 void available_flights(){
     cout << "Available Cities:" << endl;
     vector<pair<string, Flight>> flight_list = filter_flights();
+
+    cout << endl;
 
     if(flight_list.empty()){ cout << "No flights available for this route." << endl; return; }
 

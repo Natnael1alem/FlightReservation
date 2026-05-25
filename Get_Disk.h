@@ -25,12 +25,27 @@ map<string, PlaneModel> plane_models;
 void read_flights();
 void read_users();
 void read_bookings();
-void i_flight_booker(string _flight_id, string _username, int _line);
+void i_flight_booker(string _flight_id, string _username, int _line, bool _is_paid, Datetime _expiry);
 void check_bookings();
 void read_plane_models();
+void update_bookings();
+
+void load_cities(){
+    cities["JFK"] = City("New York", "JFK");
+    cities["LHR"] = City("London", "LHR");
+    cities["DXB"] = City("Dubai", "DXB");
+    cities["CDG"] = City("Paris", "CDG");
+    cities["HND"] = City("Tokyo", "HND");
+    cities["FRA"] = City("Frankfurt", "FRA");
+    cities["SIN"] = City("Singapore", "SIN");
+    cities["LAX"] = City("Los Angeles", "LAX");
+}
 
 // Default dummy datas (for during development)
 void seed(){
+    // Load the cities
+    load_cities();
+
     // Check if files already exist
     ifstream check("output/NAME_LIST.txt");
     if(check.good()){
@@ -104,17 +119,6 @@ void seed(){
     o_plane_list.close();
 
     cout << "Seed data written successfully!" << endl;
-}
-
-void load_cities(){
-    cities["JFK"] = City("New York", "JFK");
-    cities["LHR"] = City("London", "LHR");
-    cities["DXB"] = City("Dubai", "DXB");
-    cities["CDG"] = City("Paris", "CDG");
-    cities["HND"] = City("Tokyo", "HND");
-    cities["FRA"] = City("Frankfurt", "FRA");
-    cities["SIN"] = City("Singapore", "SIN");
-    cities["LAX"] = City("Los Angeles", "LAX");
 }
 
 void read_disk(){
@@ -231,14 +235,42 @@ void read_bookings(){
 
     string flight_line;
     while(getline(i_booking_list, flight_line)){
-        size_t pos = flight_line.find(".");
-        size_t pos1 = flight_line.find("$");
-        temp_line = stoi(flight_line.substr(0,pos));
-        temp_flight_id = flight_line.substr(pos+1,(pos1-pos-1));
-        temp_username = flight_line.substr(pos1+1);
+        if(flight_line.empty()) continue;
 
-        i_flight_booker(temp_flight_id, temp_username, temp_line);
+        size_t pos  = flight_line.find(".");
+        size_t pos1 = flight_line.find("$");
+        size_t pos2 = flight_line.find("%");
+        size_t pos3 = flight_line.find("!");
+
+        temp_line      = stoi(flight_line.substr(0, pos));
+        temp_flight_id = flight_line.substr(pos+1, pos1-pos-1);
+
+        bool temp_is_paid = true;
+        Datetime temp_expiry = Datetime::add_days(Datetime::get_today(), 1);
+        bool legacy_format = (pos2 == string::npos || pos3 == string::npos);
+
+        if(legacy_format){
+            temp_username = flight_line.substr(pos1+1);
+        } else {
+            temp_username = flight_line.substr(pos1+1, pos2-pos1-1);
+            temp_is_paid = (flight_line.substr(pos2+1, pos3-pos2-1) == "1");
+            string date_str = flight_line.substr(pos3+1);
+            int d, mo, y, h, mi;
+            sscanf(date_str.c_str(), "%d.%d.%d.%d.%d", &d, &mo, &y, &h, &mi);
+            temp_expiry = Datetime(d, mo, y, h, mi);
+        }
+
+        i_flight_booker(temp_flight_id, temp_username, temp_line, temp_is_paid, temp_expiry);
     }
+    // while(getline(i_booking_list, flight_line)){
+    //     size_t pos = flight_line.find(".");
+    //     size_t pos1 = flight_line.find("$");
+    //     temp_line = stoi(flight_line.substr(0,pos));
+    //     temp_flight_id = flight_line.substr(pos+1,(pos1-pos-1));
+    //     temp_username = flight_line.substr(pos1+1);
+
+    //     i_flight_booker(temp_flight_id, temp_username, temp_line);
+    // }
 
     line = temp_line;
 
@@ -248,10 +280,11 @@ void read_bookings(){
 }
 
 
-void i_flight_booker(string _flight_id, string _username, int temp_line){
+void i_flight_booker(string _flight_id, string _username, int temp_line, bool _is_paid, Datetime _expiry){
     //Add Booking Relationship
     Booking temp_booking;
-    temp_booking.set_booking(_username, _flight_id, temp_line);
+    // temp_booking.set_booking(_username, _flight_id, temp_line );
+    temp_booking.set_booking(_username, _flight_id, temp_line, _is_paid, _expiry);
     bookings[temp_line] = temp_booking;
     //cout<<"Booking read User: "<<temp_booking.get_line()<<endl;
     cout<<"Booking read User: "<<bookings[temp_booking.get_line()].get_username()<<", Flight: "<<bookings[temp_booking.get_line()].get_flight_id()<<", Line: "<<bookings[temp_booking.get_line()].get_line()<<endl;
@@ -338,6 +371,24 @@ void read_plane_models(){
         plane_models[code] = PlaneModel(name, capacity);
     }
     file.close();
+}
+
+void check_expiry(){
+    Datetime today = Datetime::get_today();
+    vector<int> to_delete;
+
+    for(auto& booking_map : bookings){
+        Booking& b = booking_map.second;
+        if(!b.get_is_paid() && today.is_before(b.get_expiry()) == false){
+            cout << "[System] Booking expired for " << b.get_username() << " on flight " << b.get_flight_id() << endl;
+            users[b.get_username()].remove_flight(b.get_flight_id());
+            flights[b.get_flight_id()].remove_passenger(b.get_username());
+            to_delete.push_back(booking_map.first);
+        }
+    }
+
+    for(int key : to_delete) bookings.erase(key);
+    if(!to_delete.empty()) update_bookings();
 }
 
 #endif

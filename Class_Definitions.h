@@ -39,14 +39,51 @@ public:
     Datetime() {}
     Datetime(int _day, int _month, int _year, int _hour, int _minute)
         : day(_day), month(_month), year(_year), hour(_hour), minute(_minute) {}
+    
+    string to_string_file(){
+        return to_string(day) + "." + to_string(month) + "." + to_string(year) + "." + to_string(hour) + "." + to_string(minute);
+    }
+
     string to_string_date(){
-        return to_string(day) + "/" + to_string(month) + "/" + to_string(year) +
-               " " + to_string(hour) + ":" + (minute < 10 ? "0" : "") + to_string(minute);
+        return to_string(day) + "/" + to_string(month) + "/" + to_string(year)
+            + " " + to_string(hour) + ":" + (minute < 10 ? "0" : "") + to_string(minute);
+    }
+    
+    bool is_before(Datetime other){
+        tm t1 = {};
+        t1.tm_mday = day; t1.tm_mon = month-1; t1.tm_year = year-1900;
+        t1.tm_hour = hour; t1.tm_min = minute;
+    
+        tm t2 = {};
+        t2.tm_mday = other.day; t2.tm_mon = other.month-1; t2.tm_year = other.year-1900;
+        t2.tm_hour = other.hour; t2.tm_min = other.minute;
+    
+        return difftime(mktime(&t1), mktime(&t2)) < 0;
+    }
+    
+    static Datetime get_today(){
+        time_t now = time(0);
+        tm* t = localtime(&now);
+        return Datetime(t->tm_mday, t->tm_mon+1, t->tm_year+1900, t->tm_hour, t->tm_min);
+    }
+    
+    static Datetime add_days(Datetime d, int days){
+        tm t = {};
+        t.tm_mday = d.day + days; t.tm_mon = d.month-1; t.tm_year = d.year-1900;
+        t.tm_hour = d.hour; t.tm_min = d.minute;
+        mktime(&t); // normalizes the date
+        return Datetime(t.tm_mday, t.tm_mon+1, t.tm_year+1900, t.tm_hour, t.tm_min);
     }
 };
 
 class User {
-public:
+    private:
+    string username;
+    string password;
+    double balance;
+    map<string, int> my_flights;
+
+    public:
     void set_details(string _username, string _password){
         username = _username;
         password = _password;
@@ -94,11 +131,6 @@ public:
         }
     }
 
-private:
-    string username;
-    string password;
-    double balance;
-    map<string, int> my_flights;
 };
 
 class Flight {
@@ -165,6 +197,8 @@ public:
         }
     }
 
+    Datetime get_datetime(){ return datetime; }
+
     string get_origin(){ return origin; }
     string get_destination(){ return destination; }
 };
@@ -174,11 +208,17 @@ class Booking{
         int data_no;
         string username;
         string flight_id;
+        bool is_paid;
+        Datetime booked_on;
+        Datetime expiry;
     public:
-        void set_booking(string _username, string _flight_id, int _line){
+        void set_booking(string _username, string _flight_id, int _line, bool _is_paid, Datetime _expiry){
             username = _username;
             flight_id = _flight_id;
             data_no = _line;
+            is_paid = _is_paid;
+            booked_on = Datetime::get_today();
+            expiry = _expiry;
         }
         
         int get_line(){
@@ -193,6 +233,10 @@ class Booking{
         string get_flight_id(){
             return flight_id;
         }
+
+        bool get_is_paid(){ return is_paid; }
+        void set_is_paid(bool _is_paid){ is_paid = _is_paid; }
+        Datetime get_expiry(){ return expiry; }
 };
 
 
