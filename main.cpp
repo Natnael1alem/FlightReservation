@@ -46,14 +46,13 @@ int main(){
         cout<<"Press 2 Log in\n";
         cout<<"Press 3 Refresh Data\n";
         cout<<"Press 4 Show Available Flights\n";
-        cout<<"Press 9 Quit\n";
 
         cout<<endl;    
 
         do{
-            cout<<"Please Enter Your Choice: ";
+            cout<<"Please Enter Your Choice (0 to Quit Program): ";
             cin>>choice;
-        }while (choice != "1" && choice != "2" && choice != "3" && choice != "4" && choice != "9");
+        }while (choice != "1" && choice != "2" && choice != "3" && choice != "4" && choice != "0");
 
         nav_no = stoi(choice);
 
@@ -70,7 +69,7 @@ int main(){
             case 4:
                 available_flights();
                 break;
-            case 9:
+            case 0:
                 cout<<"Quitting the program ... "<<endl;
                 nav_cycle = false;
                 break;

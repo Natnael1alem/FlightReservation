@@ -1,3 +1,5 @@
-alex$a*70000
+alex$a*65500
 bob$b*50000
-chen$c*30000
+chen$c*6400
+mike$hill*1.5734e+07
+nat$n*70200

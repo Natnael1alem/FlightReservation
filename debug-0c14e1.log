@@ -1,0 +1,15 @@
+{"sessionId":"0c14e1","location":"Get_Disk.h:read_bookings","message":"extended booking line","hypothesisId":"D","data":{"line":1,"paid":true},"timestamp":1779766231012}
+{"sessionId":"0c14e1","location":"Get_Disk.h:i_flight_booker","message":"booking stored","hypothesisId":"C","data":{"line":1,"paid":true,"expiry":"27.5.2026.1.52"},"timestamp":1779766231012}
+{"sessionId":"0c14e1","location":"Get_Disk.h:read_bookings","message":"extended booking line","hypothesisId":"D","data":{"line":2,"paid":true},"timestamp":1779766231013}
+{"sessionId":"0c14e1","location":"Get_Disk.h:i_flight_booker","message":"booking stored","hypothesisId":"C","data":{"line":2,"paid":true,"expiry":"27.5.2026.1.52"},"timestamp":1779766231013}
+{"sessionId":"0c14e1","location":"Get_Disk.h:read_bookings","message":"extended booking line","hypothesisId":"D","data":{"line":6,"paid":true},"timestamp":1779766231014}
+{"sessionId":"0c14e1","location":"Get_Disk.h:i_flight_booker","message":"booking stored","hypothesisId":"C","data":{"line":6,"paid":true,"expiry":"27.5.2026.2.13"},"timestamp":1779766231014}
+{"sessionId":"0c14e1","location":"Get_Disk.h:read_bookings","message":"extended booking line","hypothesisId":"D","data":{"line":7,"paid":true},"timestamp":1779766231015}
+{"sessionId":"0c14e1","location":"Get_Disk.h:i_flight_booker","message":"booking stored","hypothesisId":"C","data":{"line":7,"paid":true,"expiry":"27.5.2026.3.42"},"timestamp":1779766231015}
+{"sessionId":"0c14e1","location":"Get_Disk.h:read_bookings","message":"extended booking line","hypothesisId":"D","data":{"line":9,"paid":true},"timestamp":1779766231017}
+{"sessionId":"0c14e1","location":"Get_Disk.h:i_flight_booker","message":"booking stored","hypothesisId":"C","data":{"line":9,"paid":true,"expiry":"27.5.2026.3.56"},"timestamp":1779766231017}
+{"sessionId":"0c14e1","location":"Get_Disk.h:read_bookings","message":"extended booking line","hypothesisId":"D","data":{"line":10,"paid":true},"timestamp":1779766231018}
+{"sessionId":"0c14e1","location":"Get_Disk.h:i_flight_booker","message":"booking stored","hypothesisId":"C","data":{"line":10,"paid":true,"expiry":"27.5.2026.3.57"},"timestamp":1779766231019}
+{"sessionId":"0c14e1","location":"Get_Disk.h:read_bookings","message":"extended booking line","hypothesisId":"D","data":{"line":11,"paid":true},"timestamp":1779766231020}
+{"sessionId":"0c14e1","location":"Get_Disk.h:i_flight_booker","message":"booking stored","hypothesisId":"C","data":{"line":11,"paid":true,"expiry":"27.5.2026.4.12"},"timestamp":1779766231021}
+{"sessionId":"0c14e1","location":"Get_Disk.h:read_bookings","message":"read_bookings done","hypothesisId":"D","data":{"bookingCount":7,"lastLine":11},"timestamp":1779766231022}

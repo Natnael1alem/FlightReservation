@@ -124,9 +124,11 @@ class User {
     bool spend(double _amount){
         if (balance >= _amount){
             balance -= _amount;
+            // cout << "\nBefore payment balance: " << before << endl;
+            // cout << "Payment successful! Remaining balance: " << users[_username].get_balance() << endl;
             return true;
         }else{
-            cout<<"Balance not Enough"<<endl;
+            // cout<<"Balance not Enough"<<endl;
             return false;
         }
     }
@@ -157,7 +159,8 @@ public:
     }      
 
     string get_flight_detail(){
-        return "Flight ID : " + flight_id +
+        return
+            // "Flight ID : " + flight_id +        
             "\nRoute     : " + origin + " -> " + destination +
             "\nPlane     : " + plane.get_model() +
             "\nDate      : " + datetime.to_string_date() +
