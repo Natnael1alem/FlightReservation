@@ -1,0 +1,51 @@
+# --- Build outputs ---
+*.exe
+*.out
+*.app
+*.o
+*.obj
+*.a
+*.lib
+*.dll
+*.so
+*.dylib
+*.pdb
+*.ilk
+*.exp
+
+build/
+Build/
+Debug/
+Release/
+x64/
+x86/
+bin/
+obj/
+out/
+
+# --- IDE / editor ---
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/c_cpp_properties.json
+
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Code Runner / temp ---
+tempCodeRunnerFile.*
+*.log
+debug-*.log
+
+# --- Runtime data (created/updated by the app) ---
+output/*
+!output/.gitkeep
+
+# --- OS ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
