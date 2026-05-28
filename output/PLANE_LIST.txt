@@ -1,5 +1,0 @@
-B737$Boeing 737*150
-A320$Airbus A320*180
-B777$Boeing 777*300
-A380$Airbus A380*500
-B787$Boeing 787*240
