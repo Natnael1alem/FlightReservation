@@ -105,6 +105,10 @@ class User {
         return my_flights;
     }
 
+    string get_username() {
+        return username;
+    }
+
     void remove_flight(string _flight_id){
         my_flights.erase(_flight_id);
     }
@@ -136,7 +140,7 @@ class User {
 };
 
 class Flight {
-public:
+    public:
     string flight_id;
     string origin;
     string destination;
@@ -162,7 +166,7 @@ public:
     string get_flight_detail(){
         return
             // "Flight ID : " + flight_id +        
-            "\nRoute     : " + origin + " -> " + destination +
+            "Route     : " + origin + " -> " + destination +
             "\nPlane     : " + plane->get_model() +
             "\nDate      : " + datetime.to_string_date() +
             "\nSeats     : " + to_string(current_number) + "/" + to_string(max_capacity) +
