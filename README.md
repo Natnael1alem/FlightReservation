@@ -2,6 +2,13 @@
 Flight Reservation System
 A console-based C++ application for managing users, flights, bookings, and wallet payments.
 
+</br>
+
+<h1> Run main.cpp to Launch the program </h1> 
+
+</br>
+
+
 Features
 User registration and login
 View and filter available flights
