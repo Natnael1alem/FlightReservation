@@ -17,6 +17,12 @@ inline bool user_has_booking(const string& user, const string& flight_id) {
     return false;
 }
 
+void enter_delay() {
+    cout << "\nPress Enter to continue...";
+    cin.ignore(1000, '\n');
+    cin.get();
+}
+
 void flight_booker(string _username);
 void store_name(User _temp_user);
 void available_flights();
@@ -57,13 +63,11 @@ string enter_pass() {
 }
 
 
-
 void wallet(string _username);
 void check_balance(string wallet_id);
 bool make_payment(string _flight_id, string _username);
 
 bool check_cycle;
-
 
 
 //Log-in System
@@ -95,6 +99,7 @@ void log_in(){
     }while(check_cycle);
     
 }
+
 void access_user(string _username) {
     cout << "access granted!" << endl;
     check_cycle = false;
@@ -123,7 +128,6 @@ void access_user(string _username) {
 
         switch (portal_nav) {
             case 1:
-                // my_flights(_username);
                 show_my_flights(_username);
                 break;
             case 2:
@@ -149,7 +153,7 @@ void access_user(string _username) {
 
         cout<<endl;
 
-    }while (portal_cycle);
+    } while (portal_cycle);
 }
 
 
@@ -177,7 +181,7 @@ void flight_booker(string _username){
 
     int flight_choice;
     do {
-        cout << "Enter Flight Number (0 to cancel): ";
+        cout << "\nEnter Flight Number (0 to cancel): ";
         cin >> flight_choice;
         if(flight_choice == 0){ cout << "Booking cancelled." << endl; enter_delay(); return; }
     } while(flight_choice < 1 || flight_choice > (int)flight_list.size());
@@ -228,7 +232,6 @@ void flight_booker(string _username){
 
     enter_delay();
 }
-
 
 
 //Delete any flight user booked
@@ -294,8 +297,6 @@ void store_bookings(string _username, string _flight_id, int _line, bool _is_pai
     o_booking_list << _line << "." << _flight_id << "$" << _username << "%" << _is_paid << "!" << _expiry.to_string_file() << endl;
      
     o_booking_list.close();
-
-    
 }
 
 //Update all the changes made to booking to the disk(BOOKING_LIST.txt)
@@ -529,12 +530,6 @@ void show_my_flights(string _username){
         cout << "\n" << i+1 << ". " << flight_list[i].second.get_flight_id() << flight_list[i].second.get_flight_detail() << endl;
 
     enter_delay();
-}
-
-void enter_delay() {
-    cout << "\nPress Enter to continue...";
-    cin.ignore(1000, '\n');
-    cin.get();
 }
 
 #endif

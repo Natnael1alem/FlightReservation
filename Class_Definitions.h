@@ -11,10 +11,10 @@ using namespace std;
 
 
 class City{
-private:
+    private:
     string city;
     string city_code;
-public:
+    public:
     City() {}  
     City(string _city, string _city_code) : city(_city), city_code(_city_code) {}
     string get_city() { return city; }
@@ -22,10 +22,10 @@ public:
 };
 
 class PlaneModel {
-private:
+    private:
     string model;
     int capacity;
-public:
+    public:
     PlaneModel() {}
     PlaneModel(string _model, int _capacity) : model(_model), capacity(_capacity) {}
     string get_model() { return model; }
@@ -33,9 +33,9 @@ public:
 };
 
 class Datetime {
-private:
+    private:
     int day, month, year, hour, minute;
-public:
+    public:
     Datetime() {}
     Datetime(int _day, int _month, int _year, int _hour, int _minute)
         : day(_day), month(_month), year(_year), hour(_hour), minute(_minute) {}
@@ -140,20 +140,21 @@ public:
     string flight_id;
     string origin;
     string destination;
-    PlaneModel plane;
+    // PlaneModel plane;
+    PlaneModel* plane = nullptr;
     int max_capacity;
     int current_number = 0;
     double price;
     map<string, int> passengers;
     Datetime datetime;
 
-    void set_details(string _flight_id, PlaneModel  _plane, string _origin, string _destination, double _price,  Datetime _datetime){
+    void set_details(string _flight_id, PlaneModel&  _plane, string _origin, string _destination, double _price,  Datetime _datetime){
         flight_id    = _flight_id;
-        plane   = _plane;
+        plane   = &_plane;
         origin       = _origin;
         destination  = _destination;
         datetime     = _datetime;
-        max_capacity = plane.get_capacity();
+        max_capacity = plane->get_capacity();
         price = _price;
 
     }      
@@ -162,7 +163,7 @@ public:
         return
             // "Flight ID : " + flight_id +        
             "\nRoute     : " + origin + " -> " + destination +
-            "\nPlane     : " + plane.get_model() +
+            "\nPlane     : " + plane->get_model() +
             "\nDate      : " + datetime.to_string_date() +
             "\nSeats     : " + to_string(current_number) + "/" + to_string(max_capacity) +
             "\nPrice     : " + to_string((int)price) + "$";
