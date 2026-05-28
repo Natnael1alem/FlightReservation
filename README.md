@@ -54,7 +54,8 @@ chen / c
 Troubleshooting
 conio.h not found
 Use a Windows toolchain (MinGW/MSVC). This project is not directly portable to Linux/macOS without replacing getch() logic.
-“...not found, failed to read disk!”
+
+</br>
 Make sure the output folder exists and the app has permission to read/write files.
 Thread-related compile issues
 For g++, include -pthread as shown above.
