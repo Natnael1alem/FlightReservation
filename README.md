@@ -6,6 +6,10 @@ A console-based C++ application for managing users, flights, bookings, and walle
 
 <h1> Run main.cpp to Launch the program </h1> 
 
+
+run: 
+g++ main.cpp -o main
+./main.exe
 </br>
 
 
